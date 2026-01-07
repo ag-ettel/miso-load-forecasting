@@ -1,0 +1,19 @@
+name: miso_project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - openjdk=17
+  - pip
+  - pip:
+      - pyspark==3.4.1
+      - delta-spark==2.4.0
+      - rtdip-sdk
+      - packaging==24.2
+      - beautifulsoup4==4.14.3
+      - polars==1.16.0
+      - delta_sharing
+      - ecmwf-api-client==1.6.4
+      - joblib
+      
