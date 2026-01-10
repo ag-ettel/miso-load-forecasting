@@ -84,6 +84,12 @@ def fetch_kmsp_weather(start_date: str, end_date: str) -> pl.DataFrame:
             pl.col("timestamp").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M")
         )
 
+        ## Add partitioning columns
+        df = df.with_columns([
+            pl.col("timestamp").dt.year().alias("year"),
+            pl.col("timestamp").dt.month().alias("month"),
+            pl.col("timestamp").dt.day().alias("day")
+        ])
         return df
 
     except requests.exceptions.RequestException as e:
@@ -93,81 +99,68 @@ def fetch_kmsp_weather(start_date: str, end_date: str) -> pl.DataFrame:
         print(f"Error processing data: {e}")
         return None
 
-def save_to_parquet(df: pl.DataFrame, output_path: str, filename: str = None):
+def save_partitioned_parquet(df: pl.DataFrame, output_path: str):
     """
-    Save Polars DataFrame to Parquet file
-
-    Parameters:
-    - df: Polars DataFrame
-    - output_path: Directory path to save the file
-    - filename: Optional custom filename (defaults to weather_data_KMSP_{start}_{end}.parquet)
+    Save Polars DataFrame with partitioning compatible with Delta Lake
     """
     if df is None or df.is_empty():
         print("No data to save")
         return False
 
-    # Create output directory if it doesn't exist
+    # Create output directory
     Path(output_path).mkdir(parents=True, exist_ok=True)
 
-    # Generate filename if not provided
-    if filename is None:
-        min_timestamp = df["timestamp"].min()
-        max_timestamp = df["timestamp"].max()
-        filename = f"weather_data_KMSP_{min_timestamp.date()}_{max_timestamp.date()}.parquet"
-
-    # Full file path
-    file_path = Path(output_path) / filename
-
     try:
-        # Write to Parquet with compression
+        # Write with Hive partitioning: year=YYYY/month=M/day=D
         df.write_parquet(
-            file_path,
+            output_path,
             compression="zstd",
-            statistics=True
+            statistics=True,
+            partition_by=["year", "month", "day"] #,
+           # maintain_order=False
         )
-        print(f"Successfully saved weather data to {file_path}")
-        print(f"Dataset contains {df.height} hourly records")
+
+        print(f"Successfully saved {df.height} hourly records to {output_path}")
+        print(f"Partition structure: year=X/month=X/day=X")
         return True
 
     except Exception as e:
-        print(f"Error saving to Parquet: {e}")
+        print(f"Error saving partitioned Parquet: {e}")
         return False
 
 def main():
     """
     Main function to fetch and save KMSP weather data
     """
-    ## Define date range here
-    ## TO DO: make dynamic
-    start_date = "2023-01-01"
-    end_date = "2026-01-07"
+    
+    # gets last 3 years
+    from datetime import datetime, timedelta
+
+    today = datetime.now()
+    start_date = datetime.now() - timedelta(days=3*367)
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    end_date_str = today.strftime("%Y-%m-%d")
 
     ## Define output directory (relative to project directory)
-    output_directory = "./data/weather"
+    output_directory = "./data/weather_kmsp"
 
-    print(f"Fetching hourly weather data for KMSP from {start_date} to {end_date}")
+    print(f"Fetching hourly weather data for KMSP from {start_date_str} to {end_date_str}")
 
     ## Fetch the data
-    weather_df = fetch_kmsp_weather(start_date, end_date)
+    weather_df = fetch_kmsp_weather(start_date_str, end_date_str)
 
     if weather_df is not None:
-        print(f"\nData preview:")
-        print(weather_df.head())
-        print(f"\nData types:")
-        print(weather_df.dtypes)
+            print(f"\nData preview:")
+            print(weather_df.head())
 
-        ## Save to Parquet
-        success = save_to_parquet(weather_df, output_directory)
+            # Save with partitioning
+            success = save_partitioned_parquet(weather_df, output_directory)
 
-        if success:
-            # Additional processing example for MISO integration
-            print("\nSample integration with MISO data:")
-            # Add hour and date columns for easier joins
-            enriched_df = weather_df.with_columns([
-                pl.col("timestamp").dt.hour().alias("hour"),
-                pl.col("timestamp").dt.date().alias("date")
-            ])
-            print(enriched_df.select(["timestamp", "date", "hour", "temperature_2m", "wind_speed_10m"]).head())
+            if success:
+                # Show partition structure
+                print("\nPartition directories created:")
+                for p in Path(output_directory).rglob("*.parquet"):
+                    print(f"  {p}")
 
 if __name__ == "__main__":
     main()
