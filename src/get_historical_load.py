@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from delta import configure_spark_with_delta_pip
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import year, month, dayofmonth
-from rtdip_sdk.pipelines.sources import MISOHistoricalLoadISOSource
+from miso_load_source_custom import MISOHistoricalLoadSeparated
 
 
 # Delta configuration
@@ -48,47 +48,54 @@ start_date_str = start_date.strftime("%Y%m%d")
 end_date_str = today.strftime("%Y%m%d")
 actual_end_date_str = (today - timedelta(days=1)).strftime("%Y%m%d")
 
-for lt in ["actual", "forecast"]:
-    current_end_date = actual_end_date_str if lt == "actual" else end_date_str
-    try:
+try:
+    miso_source = MISOHistoricalLoadSeparated(
+        spark,
+        options={
+            "start_date": start_date_str,
+            "end_date": actual_end_date_str,
+            "fill_missing": "false" # must be false to ensure proper forecast error analysis
+        }
+    )
 
-        miso_source = MISOHistoricalLoadISOSource(
-            spark,
-            options={
-                "load_type": lt,
-                "start_date": start_date_str,
-                "end_date": current_end_date,
-                "fill_missing": False
-            }
-        )
+    # Get actual and forecast as separate dataframes
+    df_actual, df_forecast = miso_source.read_batch_separated()
 
-        df = miso_source.read_batch()
+    print(f"Successfully pulled {df_actual.count()} actual records")
+    print(f"Successfully pulled {df_forecast.count()} forecast records")
 
-        if df.count() == 0:
-                    raise ValueError("No records returned - possible API issue or invalid date range")
+    # Process actual data
+    print("\nProcessing actual load data...")
+    from pyspark.sql.functions import lit
+    df_actual = df_actual.withColumn("load_type", lit("actual"))
+    df_actual = df_actual.withColumn("year", year("Datetime")) \
+        .withColumn("month", month("Datetime")) \
+        .withColumn("day", dayofmonth("Datetime"))
+    
+    (df_actual.write
+    .format("delta")
+    .partitionBy("year", "month", "day")
+    .mode("overwrite")
+    .save("data/miso_load_actual"))
+    
+    print("Saved actual load data")
 
+    # Process forecast data
+    print("\nProcessing forecast load data...")
+    df_forecast = df_forecast.withColumn("load_type", lit("forecast"))
+    df_forecast = df_forecast.withColumn("year", year("Datetime")) \
+        .withColumn("month", month("Datetime")) \
+        .withColumn("day", dayofmonth("Datetime"))
+    
+    (df_forecast.write
+    .format("delta")
+    .partitionBy("year", "month", "day")
+    .mode("overwrite")
+    .save("data/miso_load_forecast"))
+    
+    print("Saved forecast load data")
 
-        print(f"Successfully pulled {df.count()} records")
-
-        ## partitioning
-        # 1. Extract date components (year/month/day)
-        # 2. Partition by year > month > day
-        # 3. Write as Delta Lake 
-        df = df.withColumn("year", year("Datetime")) \
-            .withColumn("month", month("Datetime")) \
-            .withColumn("day", dayofmonth("Datetime"))
-
-        # Write
-        file_path = "data/miso_load_" + lt
-        (df.write
-        .format("delta")  # Delta lake
-        .partitionBy("year", "month", "day")  # date partitioning
-        .mode("overwrite")
-        .save(file_path))
-
-
-    except Exception as e:
-        print(f"ERROR processing {lt} data: {str(e)}")
-        continue
+except Exception as e:
+    print(f"ERROR processing MISO data: {str(e)}")
 
 spark.stop()

@@ -84,6 +84,9 @@ def fetch_kmsp_weather(start_date: str, end_date: str) -> pl.DataFrame:
             pl.col("timestamp").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M")
         )
 
+        ## remove duplicates if any
+        df = df.unique(subset=["timestamp"])
+
         ## Add partitioning columns
         df = df.with_columns([
             pl.col("timestamp").dt.year().alias("year"),
@@ -99,9 +102,33 @@ def fetch_kmsp_weather(start_date: str, end_date: str) -> pl.DataFrame:
         print(f"Error processing data: {e}")
         return None
 
-def save_partitioned_parquet(df: pl.DataFrame, output_path: str):
+def get_max_timestamp(output_path: str) -> datetime:
+    """
+    Read existing parquet files and return the maximum timestamp
+    Returns None if no data exists
+    """
+    try:
+        parquet_files = list(Path(output_path).rglob("*.parquet"))
+        if not parquet_files:
+            print(f"No existing data found in {output_path}")
+            return None
+        
+        # Read all parquet files and get max timestamp
+        df_existing = pl.scan_parquet(str(parquet_files[0])).select("timestamp").collect()
+        if df_existing.is_empty():
+            return None
+        
+        max_ts = df_existing.select(pl.col("timestamp").max()).item()
+        print(f"Found existing data. Max timestamp: {max_ts}")
+        return max_ts
+    except Exception as e:
+        print(f"Error reading existing data: {e}")
+        return None
+
+def save_partitioned_parquet(df: pl.DataFrame, output_path: str, append: bool = False):
     """
     Save Polars DataFrame with partitioning compatible with Delta Lake
+    If append=True, append to existing data instead of overwriting
     """
     if df is None or df.is_empty():
         print("No data to save")
@@ -111,13 +138,26 @@ def save_partitioned_parquet(df: pl.DataFrame, output_path: str):
     Path(output_path).mkdir(parents=True, exist_ok=True)
 
     try:
+        if append:
+            # Read existing data
+            existing_files = list(Path(output_path).rglob("*.parquet"))
+            if existing_files:
+                df_existing = pl.scan_parquet(f"{output_path}/**/*.parquet").collect()
+                # Combine with new data and deduplicate by timestamp
+                df = pl.concat([df_existing, df]).unique(subset=["timestamp"])
+                print(f"Appending {df.height - df_existing.height} new records to existing {df_existing.height} records")
+            
+            # Remove old partitioned data before writing new combined dataset
+            import shutil
+            for partition_dir in Path(output_path).glob("year=*"):
+                shutil.rmtree(partition_dir)
+        
         # Write with Hive partitioning: year=YYYY/month=M/day=D
         df.write_parquet(
             output_path,
             compression="zstd",
             statistics=True,
-            partition_by=["year", "month", "day"] #,
-           # maintain_order=False
+            partition_by=["year", "month", "day"]
         )
 
         print(f"Successfully saved {df.height} hourly records to {output_path}")
@@ -133,18 +173,28 @@ def main():
     Main function to fetch and save KMSP weather data
     """
     
-    # gets last 3 years
-    from datetime import datetime, timedelta
+    # Define output directory (relative to project directory)
+    output_directory = "./data/weather_kmsp"
 
+    # Check if data exists and get max timestamp
+    max_existing_ts = get_max_timestamp(output_directory)
+    
     today = datetime.now()
-    start_date = datetime.now() - timedelta(days=3*367)
+    
+    # If data exists, only fetch from after the max timestamp
+    # Otherwise, fetch last 3 years
+    if max_existing_ts:
+        start_date = max_existing_ts
+        append_mode = True
+    else:
+        start_date = today - timedelta(days=3*366)
+        append_mode = False
+    
     start_date_str = start_date.strftime("%Y-%m-%d")
     end_date_str = today.strftime("%Y-%m-%d")
 
-    ## Define output directory (relative to project directory)
-    output_directory = "./data/weather_kmsp"
-
     print(f"Fetching hourly weather data for KMSP from {start_date_str} to {end_date_str}")
+    print(f"Append mode: {append_mode}")
 
     ## Fetch the data
     weather_df = fetch_kmsp_weather(start_date_str, end_date_str)
@@ -153,8 +203,8 @@ def main():
             print(f"\nData preview:")
             print(weather_df.head())
 
-            # Save with partitioning
-            success = save_partitioned_parquet(weather_df, output_directory)
+            # Save with partitioning (append if data exists)
+            success = save_partitioned_parquet(weather_df, output_directory, append=append_mode)
 
             if success:
                 # Show partition structure
