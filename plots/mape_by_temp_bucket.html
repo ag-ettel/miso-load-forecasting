@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-e7c61357e91d77a342028e4d77d91120"}, "mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "TemperatureBucketLabel", "type": "nominal"}, {"field": "MeanAbsolutePercentageError", "type": "quantitative"}, {"field": "Count", "type": "quantitative"}], "x": {"field": "TemperatureBucketLabel", "sort": ["Extreme Cold (\u2264 -10\u00b0F)", "Very Cold (-10\u00b0F to 10\u00b0F)", "Cold (10\u00b0F to 32\u00b0F)", "Cool (32\u00b0F to 50\u00b0F)", "Mild (50\u00b0F to 70\u00b0F)", "Hot (70\u00b0F to 85\u00b0F)", "Extreme Hot (>85\u00b0F)"], "title": "Temperature Bucket", "type": "nominal"}, "y": {"field": "MeanAbsolutePercentageError", "type": "quantitative"}}, "height": 400, "title": "Mean Absolute Percentage Error by Temperature Bucket", "width": 900, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-e7c61357e91d77a342028e4d77d91120": [{"TemperatureBucket": "Cold", "MeanAbsolutePercentageError": 2.1671085897835303, "ProportionUnderForecast": 0.5699491621163623, "Count": 5311, "TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)"}, {"TemperatureBucket": "Cool", "MeanAbsolutePercentageError": 2.0963088165480386, "ProportionUnderForecast": 0.5616692426584234, "Count": 6470, "TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)"}, {"TemperatureBucket": "Extreme Cold", "MeanAbsolutePercentageError": 2.3915103139631024, "ProportionUnderForecast": 0.7636363636363637, "Count": 110, "TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)"}, {"TemperatureBucket": "Extreme Hot", "MeanAbsolutePercentageError": 2.8817613917005165, "ProportionUnderForecast": 0.6147704590818364, "Count": 501, "TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)"}, {"TemperatureBucket": "Hot", "MeanAbsolutePercentageError": 2.577031976373628, "ProportionUnderForecast": 0.5689116859946476, "Count": 4484, "TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)"}, {"TemperatureBucket": "Mild", "MeanAbsolutePercentageError": 2.1682335338708794, "ProportionUnderForecast": 0.5073823823823824, "Count": 7992, "TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)"}, {"TemperatureBucket": "Very Cold", "MeanAbsolutePercentageError": 2.4489763120438734, "ProportionUnderForecast": 0.6671554252199413, "Count": 1364, "TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
