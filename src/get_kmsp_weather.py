@@ -87,6 +87,86 @@ def fetch_kmsp_weather(start_date: str, end_date: str) -> pl.DataFrame:
         ## remove duplicates if any
         df = df.unique(subset=["timestamp"])
 
+        ## data quality: handle nulls and validate physical states
+        key_vars = ["temperature_2m", "relative_humidity_2m", "dewpoint_2m", "precipitation", "wind_speed_10m"]
+        
+        # Sort by timestamp to ensure fills work correctly
+        df = df.sort("timestamp")
+        
+        # Strategy: forward-fill up to 6 hours for short gaps, then use rolling mean for 6 to 24 hour gaps
+        print("\n=== Null Imputation Strategy ===")
+        for var in key_vars:
+            nulls_before = df.filter(pl.col(var).is_null()).height
+            
+            # Forward-fill up to 6 hours (short gaps)
+            df = df.with_columns(
+                pl.col(var).forward_fill(limit=6).alias(f"{var}_filled")
+            )
+            
+            # For remaining nulls, use 24-hour rolling mean (daily average)
+            df = df.with_columns(
+                pl.col(f"{var}_filled").fill_null(
+                    pl.col(var).rolling_mean(window_size=24)
+                ).alias(var)
+            )
+            
+            df = df.drop(f"{var}_filled")
+            
+            nulls_after = df.filter(pl.col(var).is_null()).height
+            print(f"{var}: {nulls_before} nulls → {nulls_after} after imputation")
+        
+        # Drop only rows with any key variable still null (persistent gaps >24 hrs)
+        records_before_null_removal = df.height
+        for var in key_vars:
+            df = df.filter(pl.col(var).is_not_null())
+        records_removed = records_before_null_removal - df.height
+        print(f"\nRemoved {records_removed} records with persistent gaps (>24 hrs)")
+        print(f"Retained {df.height} records after null handling")   
+        
+        ## Validate impossible physical states
+        df = df.with_columns([
+            ## dew point should not exceed temperature
+            (pl.col("dewpoint_2m") > pl.col("temperature_2m")).alias("dew_gt_temp_flag"),
+            ## temperature bounds -60 to 120 F, flag outside this range
+            ((pl.col("temperature_2m") < -60) | (pl.col("temperature_2m") > 120)).alias("temp_out_of_bounds_flag"),
+            ## wind speed cannot be negative
+            (pl.col("wind_speed_10m") < 0).alias("neg_wind_speed_flag"),
+            ## wind speed upper bound (200 mph)
+            (pl.col("wind_speed_10m") > 200).alias("excessive_wind_speed_flag"),
+            ## relative humidity bounds 0-100%
+            ((pl.col("relative_humidity_2m") < 0) | (pl.col("relative_humidity_2m") > 100)).alias("rh_out_of_bounds_flag")
+        ])
+        
+        # Report all anomalies
+        anomaly_flags = [
+            "dew_gt_temp_flag",
+            "temp_out_of_bounds_flag",
+            "neg_wind_speed_flag",
+            "excessive_wind_speed_flag",
+            "rh_out_of_bounds_flag"
+        ]
+        
+        print("\n=== Data Quality Report ===")
+        for flag in anomaly_flags:
+            flag_count = df.filter(pl.col(flag)).height
+            pct = 100 * flag_count / df.height if df.height > 0 else 0
+            print(f"{flag}: {flag_count} records ({pct:.2f}%)")
+        
+        # Filter rows with critical anomalies (not excessive wind, which can occur in severe weather)
+        records_before = df.height
+        df = df.filter(
+            ~(pl.col("dew_gt_temp_flag") | 
+              pl.col("temp_out_of_bounds_flag") | 
+              pl.col("neg_wind_speed_flag") | 
+              pl.col("rh_out_of_bounds_flag"))
+        )
+        records_filtered = records_before - df.height
+        print(f"\nFiltered {records_filtered} anomalous records ({100*records_filtered/records_before:.2f}% of total)")
+        
+        # Drop flag columns before saving
+        df = df.drop(anomaly_flags)
+
+
         ## Add partitioning columns
         df = df.with_columns([
             pl.col("timestamp").dt.year().alias("year"),

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-897dd1471d62bcf2df5143eb7378564e"}, "mark": {"type": "bar"}, "encoding": {"color": {"field": "ForecastDirection", "scale": {"scheme": "set2"}, "type": "nominal"}, "tooltip": [{"field": "TemperatureBucketLabel", "type": "nominal"}, {"field": "ForecastDirection", "type": "nominal"}, {"field": "AvgAbsolutePercentageError", "type": "quantitative"}, {"field": "Count", "type": "quantitative"}], "x": {"field": "TemperatureBucketLabel", "sort": ["Extreme Cold (\u2264 -10\u00b0F)", "Very Cold (-10\u00b0F to 10\u00b0F)", "Cold (10\u00b0F to 32\u00b0F)", "Cool (32\u00b0F to 50\u00b0F)", "Mild (50\u00b0F to 70\u00b0F)", "Hot (70\u00b0F to 85\u00b0F)", "Extreme Hot (>85\u00b0F)"], "title": "Temperature Bucket", "type": "nominal"}, "xOffset": {"field": "ForecastDirection", "type": "nominal"}, "y": {"field": "AvgAbsolutePercentageError", "type": "quantitative"}}, "height": 400, "title": "Average Absolute Percentage Error by Temperature Bucket and Forecast Direction", "width": 900, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-897dd1471d62bcf2df5143eb7378564e": [{"TemperatureBucket": "Cold", "IsUnderForecast": false, "AvgAbsolutePercentageError": 2.075393596357679, "Count": 2284, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)"}, {"TemperatureBucket": "Cold", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.2363114457414546, "Count": 3027, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)"}, {"TemperatureBucket": "Cool", "IsUnderForecast": false, "AvgAbsolutePercentageError": 1.8788973517729934, "Count": 2836, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)"}, {"TemperatureBucket": "Cool", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.2659783030923513, "Count": 3634, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)"}, {"TemperatureBucket": "Extreme Cold", "IsUnderForecast": false, "AvgAbsolutePercentageError": 1.548461286974642, "Count": 26, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)"}, {"TemperatureBucket": "Extreme Cold", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.6524540604119125, "Count": 84, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)"}, {"TemperatureBucket": "Extreme Hot", "IsUnderForecast": false, "AvgAbsolutePercentageError": 3.5176316724000225, "Count": 193, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)"}, {"TemperatureBucket": "Extreme Hot", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.48331020931414, "Count": 308, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)"}, {"TemperatureBucket": "Hot", "IsUnderForecast": false, "AvgAbsolutePercentageError": 2.7161528536941812, "Count": 1933, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)"}, {"TemperatureBucket": "Hot", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.4716142359343363, "Count": 2551, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)"}, {"TemperatureBucket": "Mild", "IsUnderForecast": false, "AvgAbsolutePercentageError": 2.1561189495834436, "Count": 3937, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)"}, {"TemperatureBucket": "Mild", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.1799955852493347, "Count": 4055, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)"}, {"TemperatureBucket": "Very Cold", "IsUnderForecast": false, "AvgAbsolutePercentageError": 2.2883502321023665, "Count": 454, "ForecastDirection": "Over Forecast", "TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)"}, {"TemperatureBucket": "Very Cold", "IsUnderForecast": true, "AvgAbsolutePercentageError": 2.5291128398388674, "Count": 910, "ForecastDirection": "Under Forecast", "TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

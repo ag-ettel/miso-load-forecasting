@@ -16,4 +16,6 @@ dependencies:
       - delta_sharing
       - ecmwf-api-client==1.6.4
       - joblib
+      - altair
+      - vegafusion==2.0.3
 

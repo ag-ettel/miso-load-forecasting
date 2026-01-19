@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"$schema": "https://vega.github.io/schema/vega/v6.json", "data": [{"name": "source_0"}, {"name": "data_0", "values": [{"Count": 26, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 209.20499999999993, "MeanAbsoluteError_end": 209.20499999999993, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)"}, {"Count": 84, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 358.88, "MeanAbsoluteError_end": 358.88, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)"}, {"Count": 454, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 291.0214537444935, "MeanAbsoluteError_end": 291.0214537444935, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)"}, {"Count": 910, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 327.8139230769231, "MeanAbsoluteError_end": 327.8139230769231, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)"}, {"Count": 2284, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 232.54767513134846, "MeanAbsoluteError_end": 232.54767513134846, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)"}, {"Count": 3027, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 264.4223389494548, "MeanAbsoluteError_end": 264.4223389494548, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)"}, {"Count": 2836, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 195.9577397743299, "MeanAbsoluteError_end": 195.9577397743299, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)"}, {"Count": 3634, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 247.142267473858, "MeanAbsoluteError_end": 247.142267473858, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)"}, {"Count": 3937, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 230.81098298196585, "MeanAbsoluteError_end": 230.81098298196585, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)"}, {"Count": 4055, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 232.95682860665846, "MeanAbsoluteError_end": 232.95682860665846, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)"}, {"Count": 1933, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 329.6471132953955, "MeanAbsoluteError_end": 329.6471132953955, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)"}, {"Count": 2551, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 308.71782438259515, "MeanAbsoluteError_end": 308.71782438259515, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)"}, {"Count": 193, "ForecastDirection": "Over Forecast", "MeanAbsoluteError": 493.1766839378238, "MeanAbsoluteError_end": 493.1766839378238, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)"}, {"Count": 308, "ForecastDirection": "Under Forecast", "MeanAbsoluteError": 353.61032467532465, "MeanAbsoluteError_end": 353.61032467532465, "MeanAbsoluteError_start": 0.0, "TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)"}]}, {"name": "source_0_x_domain_TemperatureBucketLabel", "values": [{"TemperatureBucketLabel": "Extreme Cold (\u2264 -10\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Very Cold (-10\u00b0F to 10\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Cold (10\u00b0F to 32\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Cool (32\u00b0F to 50\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Mild (50\u00b0F to 70\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Hot (70\u00b0F to 85\u00b0F)", "sort_field": 7.0}, {"TemperatureBucketLabel": "Extreme Hot (>85\u00b0F)", "sort_field": 7.0}]}, {"name": "data_0_xOffset_domain_ForecastDirection", "values": [{"ForecastDirection": "Over Forecast"}, {"ForecastDirection": "Under Forecast"}]}, {"name": "data_0_color_domain_ForecastDirection", "values": [{"ForecastDirection": "Over Forecast"}, {"ForecastDirection": "Under Forecast"}]}], "marks": [{"type": "rect", "name": "marks", "from": {"data": "data_0"}, "encode": {"update": {"fill": {"field": "ForecastDirection", "scale": "color"}, "y": {"field": "MeanAbsoluteError_end", "scale": "y"}, "y2": {"field": "MeanAbsoluteError_start", "scale": "y"}, "x": {"field": "TemperatureBucketLabel", "scale": "x", "offset": {"field": "ForecastDirection", "scale": "xOffset"}}, "width": {"signal": "max(0.25, bandwidth('xOffset'))"}, "tooltip": {"signal": "{\"TemperatureBucketLabel\": isValid(datum[\"TemperatureBucketLabel\"]) ? datum[\"TemperatureBucketLabel\"] : \"\"+datum[\"TemperatureBucketLabel\"], \"ForecastDirection\": isValid(datum[\"ForecastDirection\"]) ? datum[\"ForecastDirection\"] : \"\"+datum[\"ForecastDirection\"], \"MeanAbsoluteError\": format(datum[\"MeanAbsoluteError\"], \"\"), \"Count\": format(datum[\"Count\"], \"\")}"}}}, "style": ["bar"]}], "scales": [{"name": "x", "type": "band", "domain": {"data": "source_0_x_domain_TemperatureBucketLabel", "field": "TemperatureBucketLabel", "sort": {"op": "max", "field": "sort_field"}}, "range": [0, {"signal": "width"}], "paddingInner": 0.2, "paddingOuter": 0.2}, {"name": "y", "type": "linear", "domain": {"data": "data_0", "fields": ["MeanAbsoluteError_start", "MeanAbsoluteError_end"]}, "range": [{"signal": "height"}, 0], "zero": true, "nice": true}, {"name": "xOffset", "type": "band", "domain": {"data": "data_0_xOffset_domain_ForecastDirection", "field": "ForecastDirection", "sort": true}, "range": [0, {"signal": "bandwidth('x')"}]}, {"name": "color", "type": "ordinal", "domain": {"data": "data_0_color_domain_ForecastDirection", "field": "ForecastDirection", "sort": true}, "range": {"scheme": "set2"}}], "axes": [{"scale": "y", "orient": "left", "maxExtent": 0, "ticks": false, "tickCount": {"signal": "ceil(height/40)"}, "grid": true, "zindex": 0, "gridScale": "x", "minExtent": 0, "aria": false, "labels": false, "domain": false}, {"scale": "x", "labelAlign": "right", "grid": false, "orient": "bottom", "labelAngle": 270, "labelBaseline": "middle", "zindex": 0, "title": "Temperature Bucket"}, {"scale": "y", "labelOverlap": true, "orient": "left", "tickCount": {"signal": "ceil(height/40)"}, "title": "MeanAbsoluteError", "zindex": 0, "grid": false}], "title": {"text": "Mean Absolute Error (MW) by Temperature Bucket and Forecast Direction", "frame": "group"}, "padding": 5, "style": "cell", "background": "white", "legends": [{"fill": "color", "symbolType": "square", "title": "ForecastDirection"}], "width": 900, "height": 400};
+      var embedOpt = {"mode": "vega"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

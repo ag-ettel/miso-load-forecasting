@@ -68,6 +68,16 @@ try:
     print("\nProcessing actual load data...")
     from pyspark.sql.functions import lit
     df_actual = df_actual.withColumn("load_type", lit("actual"))
+    # data quality: filter out load values less than or equal to zero
+    actual_count_before = df_actual.count()
+    df_actual = df_actual.filter(df_actual["Lrz1"] > 0) 
+    actual_count_after = df_actual.count()
+    print(f"Filtered out {actual_count_before - actual_count_after} actual records with non-positive load values")
+    # flag Lrz1 load values greater than stated installed capacity (20304 MW* for lrz_1)
+    # *source: https://cdn.misoenergy.org/PY%202026-2027%20LOLE%20Study%20Report728909.pdf
+    # note: this project focuses on lrz_1 (MISO North), but similar checks should be applied if other LRZs are used
+    df_actual = df_actual.withColumn("Lrz1_capacity_flag", (df_actual["Lrz1"] > 20304).cast("integer"))
+    # add partitioning columns (year, month, day)
     df_actual = df_actual.withColumn("year", year("Datetime")) \
         .withColumn("month", month("Datetime")) \
         .withColumn("day", dayofmonth("Datetime"))
@@ -83,6 +93,14 @@ try:
     # Process forecast data
     print("\nProcessing forecast load data...")
     df_forecast = df_forecast.withColumn("load_type", lit("forecast"))
+    # data quality: filter out load values less than or equal to zero
+    forecast_count_before = df_forecast.count()
+    df_forecast = df_forecast.filter(df_forecast["Lrz1"] > 0)
+    forecast_count_after = df_forecast.count()
+    print(f"Filtered out {forecast_count_before - forecast_count_after} forecast records with non-positive load values")
+     # flag Lrz1 load values greater than stated installed capacity (20304 MW* for lrz_1)
+    df_forecast = df_forecast.withColumn("Lrz1_capacity_flag", (df_forecast["Lrz1"] > 20304).cast("integer"))
+    # add partitioning columns (year, month, day)
     df_forecast = df_forecast.withColumn("year", year("Datetime")) \
         .withColumn("month", month("Datetime")) \
         .withColumn("day", dayofmonth("Datetime"))
