@@ -16,7 +16,8 @@ and false-scarcity pricing in which real-time prices were significantly lower th
 
 **Key Finding**: Load forecasting error costs are **regime-dependent**, not directional. 
 During **true scarcity** (RT > DA), under-forecasting creates 10x or greater cost asymmetry via scarcity pricing. 
-During  **"false scarcity"**  —as seen Jan 16-17, 2024 (DA $165/MWh, RT $44/MWh) (FERC 561/RUS 580, non-recoverable). 
+During  **"false scarcity"**  —as seen Jan 16-17, 2024 (DA Ex-Post $165/MWh, RT Ex-Post $44/MWh). 
+False scarcity also creates potential uplift obligations if generators do not cover their costs.
 The correct hedge depends on the **scarcity regime prediction**, not blanket directional bias.
 
 
@@ -41,16 +42,12 @@ The correct hedge depends on the **scarcity regime prediction**, not blanket dir
 
 ## Phase 2: Directional Error Asymmetry (Work in progress)
 
-- `acquire_miso_fuel_mix.py` - Fuel mix pipeline
-- `acquire_miso_prices.py` - Day-ahead/real-time pricing
-- `analysis_cost_asymmetry.py` - Regime identification and dollarize error costs
+- Acquire data for day-ahead/real-time pricing for key nodes in LRZ1.
+- Acquire data for forecasted wind energy production.
+- Acquire data for natural gas pipeline capactiy.
+- Exploratory data analysis for wind / weather / pipeline constraints / DA-RT spreads.
+- Regime classification and cost metrics.
 
-### Phase 2 Methodology (plan)
 
-**Scarcity Regime Identification**: Rule-based classifier using:
-- Day-ahead price level
-- RT-DA spread magnitude and direction 
-- Temperature forecast confidence intervals
-- Gas pipeline capacity constraints
 
 
